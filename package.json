@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "test": "npx jasmine"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -14,5 +15,8 @@
     "lodash": "^4.17.21",
     "morgan": "^1.9.1",
     "nodemon": "^2.0.12"
+  },
+  "devDependencies": {
+    "jasmine": "^3.8.0"
   }
 }

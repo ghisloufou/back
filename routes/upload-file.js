@@ -1,6 +1,8 @@
 var express = require("express");
-fs = require('fs');
+fs = require("fs");
 var router = express.Router();
+var Transformer = require("../Transformer");
+var transformer = new Transformer();
 
 /* Listening for new file post */
 router.post("/", async (req, res) => {
@@ -11,30 +13,31 @@ router.post("/", async (req, res) => {
         message: "No file uploaded",
       });
     } else {
-      console.log("req.files", req.files);
       //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
       let file = req.files.file;
 
-      //Use the mv() method to place the file in upload directory (i.e. "uploads")
+      //Use the mv() method moves the file in the given path
       file.mv("./uploads/last-file.txt");
-      file.mv("./public/file/new-file.txt");
-      fs.writeFile("./public/file/new-file.txt", 'Hello World!', function (err) {
-        if (err) return console.log(err);
-        console.log('Hello World > helloworld.txt');
-      });
+      fs.readFile("./uploads/last-file.txt", "utf8", function (err, data) {
+        var result = transformer.transformData(data);
+        console.log("newData", result.transformedData);
 
-      //TODO: Create new file here:
+        fs.writeFile(
+          "./public/new-file.txt",
+          "result.transformedData",
+          function (err) {
+            if (err) return console.log(err);
+          }
+        );
 
-      //send response
-      res.send({
-        status: true,
-        message: "File is uploaded",
-        data: {
-          name: file.name,
-          mimetype: file.mimetype,
-          size: file.size,
-          newFileUrl: "./file/new-file.txt",
-        },
+        //send response
+        res.send({
+          status: result.valid,
+          message: result.valid ? "File is uploaded" : "Incorrect file format",
+          newFileUrl: result.valid ? "./new-file.txt" : "",
+          map: result.transformedData,
+          newMap: {},
+        });
       });
     }
   } catch (err) {

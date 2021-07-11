@@ -65,26 +65,16 @@ class DataService {
         this.apiUrl = 'http://127.0.0.1:3000/';
     }
     /**
-     * Get data gathered from the files
-     * @returns Observable of data
+     * Post a file and returns transformed file data
+     * @argument {File} file
+     * @returns {status: boolean, message: string, newFileUrl: string, map: TreasureMap, newMap: TreasureMap} response
      */
-    getData() {
-        return this.http.get(this.apiUrl + 'data').pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["catchError"])((error) => {
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_1__["of"])({
-                width: 7,
-                height: 4,
-            });
-        }));
-    }
     postFile(file) {
         let formData = new FormData();
         formData.append('file', file);
         return this.http.post(this.apiUrl + 'upload-file', formData).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["catchError"])((error) => {
             console.log('postFile error', error);
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_1__["of"])({
-                width: 7,
-                height: 4,
-            });
+            return Object(rxjs__WEBPACK_IMPORTED_MODULE_1__["throwError"])(error);
         }));
     }
 }
@@ -203,7 +193,7 @@ function AppComponent_div_5_Template(rf, ctx) { if (rf & 1) {
 } }
 function AppComponent_div_6_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 14);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, " Chargez un fichier pour pouvoir visualiser sa carte aux tr\u00E9sors ! ");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, " Attention, le format du fichier envoy\u00E9 n'est pas bon. ");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } }
 const _c0 = function (a0) { return { disabled: a0 }; };
@@ -216,16 +206,17 @@ class AppComponent {
             mountain: 'Les montagnes ne sont pas franchissables.',
             player: "C'est un aventurier.",
         };
-        this.error = '';
+        this.error = false;
     }
     postFile(event) {
         let files = event.target.files;
-        console.log('files', files);
         if (files) {
-            console.log('file', files[0]);
             this.ds.postFile(files[0]).subscribe((response) => {
                 console.log('response', response);
-                this.newFileUrl = response.data.newFileUrl;
+                this.newFileUrl = response.newFileUrl;
+                this.error = !response.status;
+                this.map = response.map;
+                this.newMap = response.newMap;
             });
         }
         // Reset input value
@@ -274,16 +265,16 @@ AppComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineCompo
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.map && ctx.error === "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.map && !ctx.error);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.map && ctx.error === "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.map && !ctx.error);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.error !== "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.error);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("map", ctx.map);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](5);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("href", ctx.newFileUrl, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"])("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](6, _c0, ctx.newFileUrl === ""));
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_2__["NgIf"], _map_map_component__WEBPACK_IMPORTED_MODULE_3__["MapComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_2__["NgClass"]], styles: ["[_nghost-%COMP%] {\n  height: 100%;\n  width: 100%;\n  display: flex;\n  background-color: #2a4563;\n}\n[_nghost-%COMP%]   h2[_ngcontent-%COMP%] {\n  color: white;\n  font-weight: 400;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%] {\n  padding: 20px;\n  background: whitesmoke;\n  border-radius: 6px;\n  margin-bottom: 20px;\n  display: flex;\n  flex-direction: column;\n  transition: all ease 1s;\n  min-height: 160px;\n  min-width: 400px;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%]    > div[_ngcontent-%COMP%]:first-of-type {\n  font-weight: 500;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%]   .error[_ngcontent-%COMP%] {\n  color: red;\n}\n[_nghost-%COMP%]   .container[_ngcontent-%COMP%] {\n  height: 100%;\n  width: 100%;\n  align-items: center;\n  display: flex;\n  flex-direction: column;\n  padding: 0px 60px;\n  position: relative;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #save[_ngcontent-%COMP%], [_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #load[_ngcontent-%COMP%] {\n  border: none;\n  border-radius: 4px;\n  padding: 10px 20px;\n  font-weight: 500;\n  cursor: pointer;\n  margin: 0 10px;\n  font-size: 1rem;\n  background: white;\n  text-decoration: none;\n  color: black;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #save.disabled[_ngcontent-%COMP%], [_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #load.disabled[_ngcontent-%COMP%] {\n  background: grey;\n  cursor: not-allowed;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   input[type=file][_ngcontent-%COMP%] {\n  display: none;\n}\n[_nghost-%COMP%]   .copyright[_ngcontent-%COMP%] {\n  margin: 20px 0;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uXFwuLlxcYXBwLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsWUFBQTtFQUNBLFdBQUE7RUFDQSxhQUFBO0VBQ0EseUJBQUE7QUFDRjtBQUFFO0VBQ0UsWUFBQTtFQUNBLGdCQUFBO0FBRUo7QUFDRTtFQUlFLGFBQUE7RUFDQSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxhQUFBO0VBQ0Esc0JBQUE7RUFDQSx1QkFBQTtFQUNBLGlCQUFBO0VBQ0EsZ0JBQUE7QUFGSjtBQVRJO0VBQ0UsZ0JBQUE7QUFXTjtBQUFJO0VBQ0UsVUFBQTtBQUVOO0FBQ0U7RUFDRSxZQUFBO0VBQ0EsV0FBQTtFQUNBLG1CQUFBO0VBQ0EsYUFBQTtFQUNBLHNCQUFBO0VBQ0EsaUJBQUE7RUFDQSxrQkFBQTtBQUNKO0FBRUk7O0VBRUUsWUFBQTtFQUNBLGtCQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0VBQ0EscUJBQUE7RUFDQSxZQUFBO0FBQU47QUFDTTs7RUFDRSxnQkFBQTtFQUNBLG1CQUFBO0FBRVI7QUFDSTtFQUNFLGFBQUE7QUFDTjtBQUVFO0VBQ0UsY0FBQTtBQUFKIiwiZmlsZSI6ImFwcC5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIjpob3N0IHtcclxuICBoZWlnaHQ6IDEwMCU7XHJcbiAgd2lkdGg6IDEwMCU7XHJcbiAgZGlzcGxheTogZmxleDtcclxuICBiYWNrZ3JvdW5kLWNvbG9yOiAjMmE0NTYzO1xyXG4gIGgyIHtcclxuICAgIGNvbG9yOiB3aGl0ZTtcclxuICAgIGZvbnQtd2VpZ2h0OiA0MDA7XHJcbiAgfVxyXG5cclxuICAuaW5mbyB7XHJcbiAgICAmID4gZGl2OmZpcnN0LW9mLXR5cGUge1xyXG4gICAgICBmb250LXdlaWdodDogNTAwO1xyXG4gICAgfVxyXG4gICAgcGFkZGluZzogMjBweDtcclxuICAgIGJhY2tncm91bmQ6IHdoaXRlc21va2U7XHJcbiAgICBib3JkZXItcmFkaXVzOiA2cHg7XHJcbiAgICBtYXJnaW4tYm90dG9tOiAyMHB4O1xyXG4gICAgZGlzcGxheTogZmxleDtcclxuICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47XHJcbiAgICB0cmFuc2l0aW9uOiBhbGwgZWFzZSAxcztcclxuICAgIG1pbi1oZWlnaHQ6IDE2MHB4O1xyXG4gICAgbWluLXdpZHRoOiA0MDBweDtcclxuICAgIC5lcnJvciB7XHJcbiAgICAgIGNvbG9yOiByZWQ7XHJcbiAgICB9XHJcbiAgfVxyXG4gIC5jb250YWluZXIge1xyXG4gICAgaGVpZ2h0OiAxMDAlO1xyXG4gICAgd2lkdGg6IDEwMCU7XHJcbiAgICBhbGlnbi1pdGVtczogY2VudGVyO1xyXG4gICAgZGlzcGxheTogZmxleDtcclxuICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47XHJcbiAgICBwYWRkaW5nOiAwcHggNjBweDtcclxuICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcclxuICB9XHJcbiAgLmFjdGlvbnMge1xyXG4gICAgI3NhdmUsXHJcbiAgICAjbG9hZCB7XHJcbiAgICAgIGJvcmRlcjogbm9uZTtcclxuICAgICAgYm9yZGVyLXJhZGl1czogNHB4O1xyXG4gICAgICBwYWRkaW5nOiAxMHB4IDIwcHg7XHJcbiAgICAgIGZvbnQtd2VpZ2h0OiA1MDA7XHJcbiAgICAgIGN1cnNvcjogcG9pbnRlcjtcclxuICAgICAgbWFyZ2luOiAwIDEwcHg7XHJcbiAgICAgIGZvbnQtc2l6ZTogMXJlbTtcclxuICAgICAgYmFja2dyb3VuZDogd2hpdGU7XHJcbiAgICAgIHRleHQtZGVjb3JhdGlvbjogbm9uZTtcclxuICAgICAgY29sb3I6IGJsYWNrO1xyXG4gICAgICAmLmRpc2FibGVkIHtcclxuICAgICAgICBiYWNrZ3JvdW5kOiBncmV5O1xyXG4gICAgICAgIGN1cnNvcjogbm90LWFsbG93ZWQ7XHJcbiAgICAgIH1cclxuICAgIH1cclxuICAgIGlucHV0W3R5cGU9XCJmaWxlXCJdIHtcclxuICAgICAgZGlzcGxheTogbm9uZTtcclxuICAgIH1cclxuICB9XHJcbiAgLmNvcHlyaWdodCB7XHJcbiAgICBtYXJnaW46IDIwcHggMDtcclxuICB9XHJcbn1cclxuIl19 */"] });
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_2__["NgIf"], _map_map_component__WEBPACK_IMPORTED_MODULE_3__["MapComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_2__["NgClass"]], styles: ["[_nghost-%COMP%] {\n  height: 100%;\n  width: 100%;\n  display: flex;\n}\n[_nghost-%COMP%]   h2[_ngcontent-%COMP%] {\n  color: white;\n  font-weight: 400;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%] {\n  padding: 20px;\n  background: whitesmoke;\n  border-radius: 6px;\n  margin-bottom: 20px;\n  display: flex;\n  flex-direction: column;\n  transition: all ease 1s;\n  min-height: 160px;\n  min-width: 400px;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%]    > div[_ngcontent-%COMP%]:first-of-type {\n  font-weight: 500;\n}\n[_nghost-%COMP%]   .info[_ngcontent-%COMP%]   .error[_ngcontent-%COMP%] {\n  color: red;\n}\n[_nghost-%COMP%]   .container[_ngcontent-%COMP%] {\n  height: 100%;\n  width: 100%;\n  align-items: center;\n  display: flex;\n  flex-direction: column;\n  padding: 0px 60px;\n  position: relative;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #save[_ngcontent-%COMP%], [_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #load[_ngcontent-%COMP%] {\n  border: none;\n  border-radius: 4px;\n  padding: 10px 20px;\n  font-weight: 500;\n  cursor: pointer;\n  margin: 0 10px;\n  font-size: 1rem;\n  background: white;\n  text-decoration: none;\n  color: black;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #save.disabled[_ngcontent-%COMP%], [_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   #load.disabled[_ngcontent-%COMP%] {\n  background: grey;\n  cursor: not-allowed;\n}\n[_nghost-%COMP%]   .actions[_ngcontent-%COMP%]   input[type=file][_ngcontent-%COMP%] {\n  display: none;\n}\n[_nghost-%COMP%]   .copyright[_ngcontent-%COMP%] {\n  margin: 20px 0;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uXFwuLlxcYXBwLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsWUFBQTtFQUNBLFdBQUE7RUFDQSxhQUFBO0FBQ0Y7QUFBRTtFQUNFLFlBQUE7RUFDQSxnQkFBQTtBQUVKO0FBQ0U7RUFJRSxhQUFBO0VBQ0Esc0JBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsYUFBQTtFQUNBLHNCQUFBO0VBQ0EsdUJBQUE7RUFDQSxpQkFBQTtFQUNBLGdCQUFBO0FBRko7QUFUSTtFQUNFLGdCQUFBO0FBV047QUFBSTtFQUNFLFVBQUE7QUFFTjtBQUNFO0VBQ0UsWUFBQTtFQUNBLFdBQUE7RUFDQSxtQkFBQTtFQUNBLGFBQUE7RUFDQSxzQkFBQTtFQUNBLGlCQUFBO0VBQ0Esa0JBQUE7QUFDSjtBQUVJOztFQUVFLFlBQUE7RUFDQSxrQkFBQTtFQUNBLGtCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxlQUFBO0VBQ0EsY0FBQTtFQUNBLGVBQUE7RUFDQSxpQkFBQTtFQUNBLHFCQUFBO0VBQ0EsWUFBQTtBQUFOO0FBQ007O0VBQ0UsZ0JBQUE7RUFDQSxtQkFBQTtBQUVSO0FBQ0k7RUFDRSxhQUFBO0FBQ047QUFFRTtFQUNFLGNBQUE7QUFBSiIsImZpbGUiOiJhcHAuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyI6aG9zdCB7XHJcbiAgaGVpZ2h0OiAxMDAlO1xyXG4gIHdpZHRoOiAxMDAlO1xyXG4gIGRpc3BsYXk6IGZsZXg7XHJcbiAgaDIge1xyXG4gICAgY29sb3I6IHdoaXRlO1xyXG4gICAgZm9udC13ZWlnaHQ6IDQwMDtcclxuICB9XHJcblxyXG4gIC5pbmZvIHtcclxuICAgICYgPiBkaXY6Zmlyc3Qtb2YtdHlwZSB7XHJcbiAgICAgIGZvbnQtd2VpZ2h0OiA1MDA7XHJcbiAgICB9XHJcbiAgICBwYWRkaW5nOiAyMHB4O1xyXG4gICAgYmFja2dyb3VuZDogd2hpdGVzbW9rZTtcclxuICAgIGJvcmRlci1yYWRpdXM6IDZweDtcclxuICAgIG1hcmdpbi1ib3R0b206IDIwcHg7XHJcbiAgICBkaXNwbGF5OiBmbGV4O1xyXG4gICAgZmxleC1kaXJlY3Rpb246IGNvbHVtbjtcclxuICAgIHRyYW5zaXRpb246IGFsbCBlYXNlIDFzO1xyXG4gICAgbWluLWhlaWdodDogMTYwcHg7XHJcbiAgICBtaW4td2lkdGg6IDQwMHB4O1xyXG4gICAgLmVycm9yIHtcclxuICAgICAgY29sb3I6IHJlZDtcclxuICAgIH1cclxuICB9XHJcbiAgLmNvbnRhaW5lciB7XHJcbiAgICBoZWlnaHQ6IDEwMCU7XHJcbiAgICB3aWR0aDogMTAwJTtcclxuICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XHJcbiAgICBkaXNwbGF5OiBmbGV4O1xyXG4gICAgZmxleC1kaXJlY3Rpb246IGNvbHVtbjtcclxuICAgIHBhZGRpbmc6IDBweCA2MHB4O1xyXG4gICAgcG9zaXRpb246IHJlbGF0aXZlO1xyXG4gIH1cclxuICAuYWN0aW9ucyB7XHJcbiAgICAjc2F2ZSxcclxuICAgICNsb2FkIHtcclxuICAgICAgYm9yZGVyOiBub25lO1xyXG4gICAgICBib3JkZXItcmFkaXVzOiA0cHg7XHJcbiAgICAgIHBhZGRpbmc6IDEwcHggMjBweDtcclxuICAgICAgZm9udC13ZWlnaHQ6IDUwMDtcclxuICAgICAgY3Vyc29yOiBwb2ludGVyO1xyXG4gICAgICBtYXJnaW46IDAgMTBweDtcclxuICAgICAgZm9udC1zaXplOiAxcmVtO1xyXG4gICAgICBiYWNrZ3JvdW5kOiB3aGl0ZTtcclxuICAgICAgdGV4dC1kZWNvcmF0aW9uOiBub25lO1xyXG4gICAgICBjb2xvcjogYmxhY2s7XHJcbiAgICAgICYuZGlzYWJsZWQge1xyXG4gICAgICAgIGJhY2tncm91bmQ6IGdyZXk7XHJcbiAgICAgICAgY3Vyc29yOiBub3QtYWxsb3dlZDtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gICAgaW5wdXRbdHlwZT1cImZpbGVcIl0ge1xyXG4gICAgICBkaXNwbGF5OiBub25lO1xyXG4gICAgfVxyXG4gIH1cclxuICAuY29weXJpZ2h0IHtcclxuICAgIG1hcmdpbjogMjBweCAwO1xyXG4gIH1cclxufVxyXG4iXX0= */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](AppComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -400,12 +391,11 @@ function MapComponent_table_0_Template(rf, ctx) { if (rf & 1) {
 } if (rf & 2) {
     const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx_r0.matrix);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx_r0.map.matrix);
 } }
 class MapComponent {
     constructor() {
         this.hoveredCellEvent = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
-        this.matrix = [];
     }
     set map(value) {
         this._map = value;
@@ -444,7 +434,7 @@ class MapComponent {
         //       });
         //   });
         if (this.map) {
-            this.matrix = Array(this.map.height)
+            this.map.matrix = Array(this.map.height)
                 .fill(null)
                 .map((a, i) => {
                 return Array(this.map.width)
@@ -464,10 +454,10 @@ class MapComponent {
      */
     setCell(cell) {
         if (cell.x > 0 &&
-            cell.x <= this.matrix.length &&
-            cell.y <= this.matrix[0].length &&
+            cell.x <= this.map.matrix.length &&
+            cell.y <= this.map.matrix[0].length &&
             cell.y > 0) {
-            this.matrix[cell.y - 1][cell.x - 1] = cell;
+            this.map.matrix[cell.y - 1][cell.x - 1] = cell;
         }
     }
 }
