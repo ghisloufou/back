@@ -4,18 +4,22 @@ Transformer.lineRules = [
   {
     letter: "C",
     arguments: 2,
+    argumentsType: ["number", "number"],
   },
   {
     letter: "M",
     arguments: 2,
+    argumentsType: ["number", "number"],
   },
   {
     letter: "T",
     arguments: 3,
+    argumentsType: ["number", "number", "number"],
   },
   {
     letter: "A",
     arguments: 5,
+    argumentsType: ["string", "number", "number", "string", "string"],
   },
 ];
 
@@ -26,11 +30,10 @@ Transformer.prototype.transformData = function (data) {
   if (validData) {
     var map = this.initMap(parsedData);
     var populatedMap = this.populateMap(map, parsedData);
+    var transformedMap = this.movePlayers(map, parsedData);
     return {
       valid: validData,
       transformedData: populatedMap,
-      test: populatedMap,
-      parsedData: parsedData,
     };
   }
   return { valid: validData, transformedData: null };
@@ -41,18 +44,27 @@ Transformer.prototype.parseData = function (data) {
   var lines = data.split("\n");
   return lines.map(function (line) {
     var args = line.replace(/\s/g, "").split("-");
-    return args;
+    return args.map((arg) => {
+      // Check wheter the arg is a digit
+      if (/^[0-9]*$/.test(arg)) arg = Number(arg);
+      return arg;
+    });
   });
 };
 
 /* Validate data according to lineRules */
 Transformer.prototype.validateData = function (parsedData) {
   var respectedRules = parsedData.every((line) => {
-    return (
-      Transformer.lineRules.find((rule) => {
-        return rule.letter === line[0] && rule.arguments === line.length - 1;
-      }) !== undefined
-    );
+    var relatedRule = Transformer.lineRules.find((rule) => {
+      return rule.letter === line[0] && rule.arguments === line.length - 1;
+    });
+    if (relatedRule !== undefined) {
+      return relatedRule.argumentsType.every((type, index) => {
+        return typeof line[index + 1] === type;
+      });
+    } else {
+      return false;
+    }
   });
 
   var noOverlap =
@@ -64,13 +76,13 @@ Transformer.prototype.validateData = function (parsedData) {
       );
     }).length === 0;
 
-  var hasOneAndOnlyOneCLine =
+  var hasOneAndOnlyOneValidCLine =
     parsedData.filter((line, index) => {
-      return line[0] === "C";
+      return line[0] === "C" && line[1] >= 0 && line[2] >= 0;
     }).length === 1;
 
   var noOutOfBounds = () => {
-    if (hasOneAndOnlyOneCLine) {
+    if (hasOneAndOnlyOneValidCLine) {
       var cLine = parsedData.filter((line, index) => {
         return line[0] === "C";
       });
@@ -99,7 +111,7 @@ Transformer.prototype.validateData = function (parsedData) {
   };
 
   return (
-    respectedRules && noOverlap && noOutOfBounds() && hasOneAndOnlyOneCLine
+    respectedRules && noOverlap && noOutOfBounds() && hasOneAndOnlyOneValidCLine
   );
 };
 
@@ -115,7 +127,7 @@ Transformer.prototype.initMap = function (parsedData) {
       return Array(width)
         .fill(null)
         .map(function (b, j) {
-          return { value: 1, type: "Grass", x: i + 1, y: j + 1 };
+          return { value: 1, type: "Grass", x: j + 1, y: i + 1 };
         });
     });
   return { matrix, height, width };
@@ -135,6 +147,12 @@ Transformer.prototype.populateMap = function (map, parsedData) {
       map.matrix[line[2]][line[3]].sequence = line[5];
     }
   });
+  return map;
+};
+
+Transformer.prototype.movePlayers = function (map, parsedData) {
+  var adventurers = parsedData.filter((line) => line[0] === "A");
+  console.log("adventurers", adventurers);
   return map;
 };
 
