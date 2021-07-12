@@ -342,13 +342,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function MapComponent_table_0_tr_1_td_1_img_3_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 8);
 } }
 function MapComponent_table_0_tr_1_td_1_img_4_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 9);
 } }
 function MapComponent_table_0_tr_1_td_1_img_5_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "img", 10);
 } }
 const _c0 = function (a0) { return { display: a0 }; };
 function MapComponent_table_0_tr_1_td_1_Template(rf, ctx) { if (rf & 1) {
@@ -360,7 +360,7 @@ function MapComponent_table_0_tr_1_td_1_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, MapComponent_table_0_tr_1_td_1_img_3_Template, 1, 0, "img", 5);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, MapComponent_table_0_tr_1_td_1_img_4_Template, 1, 0, "img", 6);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, MapComponent_table_0_tr_1_td_1_img_5_Template, 1, 0, "img", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, MapComponent_table_0_tr_1_td_1_img_5_Template, 1, 0, "img", 7);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const cell_r4 = ctx.$implicit;
@@ -399,53 +399,15 @@ class MapComponent {
     }
     set map(value) {
         this._map = value;
-        this.fillMap();
     }
     get map() {
         return this._map;
     }
     ngOnInit() {
-        // Get data then fill the map
-        // this.ds.dataObservable().subscribe((treasureMap) => {
-        //   this.map = treasureMap;
-        //   this.fillMap();
-        //   this.setCell({ value: 1, type: 'Mountain', x: 2, y: 1 });
-        //   this.setCell({ value: 2, type: 'Treasure', x: 3, y: 2 });
-        //   console.table(this.matrix);
-        // });
     }
     emitHoveredCell(cell) {
         this.hoveredCellEvent.emit(cell);
     }
-    /**
-     * Fill the map with the height and width
-     */
-    fillMap() {
-        // if (!this.map) {
-        //   this.map = { width: 10, height: 4 };
-        // }
-        // this.matrix = Array(this.map.height)
-        //   .fill(null)
-        //   .map((a, i) => {
-        //     return Array(this.map.width)
-        //       .fill(null)
-        //       .map((b, j) => {
-        //         return { value: 1, type: 'Grass', x: i + 1, y: j + 1 };
-        //       });
-        //   });
-        if (this.map) {
-            this.map.matrix = Array(this.map.height)
-                .fill(null)
-                .map((a, i) => {
-                return Array(this.map.width)
-                    .fill(null)
-                    .map((b, j) => {
-                    return { value: 1, type: 'Grass', x: i + 1, y: j + 1 };
-                });
-            });
-        }
-    }
-    addItemToArray() { }
     /**
      * Set a value in the map at certain coordinates
      * @param x Horizontal coordinate from 1 to map width
@@ -462,7 +424,7 @@ class MapComponent {
     }
 }
 MapComponent.ɵfac = function MapComponent_Factory(t) { return new (t || MapComponent)(); };
-MapComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: MapComponent, selectors: [["app-map"]], inputs: { map: "map" }, outputs: { hoveredCellEvent: "hoveredCellEvent" }, decls: 1, vars: 1, consts: [[4, "ngIf"], [4, "ngFor", "ngForOf"], [3, "mouseover", "click", 4, "ngFor", "ngForOf"], [3, "mouseover", "click"], [1, "cell-value", 3, "ngStyle"], ["src", "../../assets/treasure.svg", 4, "ngIf"], ["src", "../../assets/mountain.svg", 4, "ngIf"], ["src", "../../assets/treasure.svg"], ["src", "../../assets/mountain.svg"]], template: function MapComponent_Template(rf, ctx) { if (rf & 1) {
+MapComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: MapComponent, selectors: [["app-map"]], inputs: { map: "map" }, outputs: { hoveredCellEvent: "hoveredCellEvent" }, decls: 1, vars: 1, consts: [[4, "ngIf"], [4, "ngFor", "ngForOf"], [3, "mouseover", "click", 4, "ngFor", "ngForOf"], [3, "mouseover", "click"], [1, "cell-value", 3, "ngStyle"], ["src", "../../assets/treasure.svg", 4, "ngIf"], ["src", "../../assets/mountain.svg", 4, "ngIf"], ["src", "../../assets/traveler.svg", 4, "ngIf"], ["src", "../../assets/treasure.svg"], ["src", "../../assets/mountain.svg"], ["src", "../../assets/traveler.svg"]], template: function MapComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, MapComponent_table_0_Template, 2, 1, "table", 0);
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.map);

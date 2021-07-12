@@ -24,8 +24,14 @@ Transformer.prototype.transformData = function (data) {
   var parsedData = this.parseData(data);
   var validData = this.validateData(parsedData);
   if (validData) {
-    var map = this.createMap(parsedData);
-    return { valid: validData, transformedData: map };
+    var map = this.initMap(parsedData);
+    var populatedMap = this.populateMap(map, parsedData);
+    return {
+      valid: validData,
+      transformedData: populatedMap,
+      test: populatedMap,
+      parsedData: parsedData,
+    };
   }
   return { valid: validData, transformedData: null };
 };
@@ -48,6 +54,7 @@ Transformer.prototype.validateData = function (parsedData) {
       }) !== undefined
     );
   });
+
   var noOverlap =
     parsedData.filter((line, index) => {
       return (
@@ -56,20 +63,52 @@ Transformer.prototype.validateData = function (parsedData) {
         }).length > 0
       );
     }).length === 0;
-  var noOutOfBounds = true; // TODO: Add noOutOfBounds logic
-  var hasCLine = true; // TODO: Add hasCLine logic (whether the file contains a C - X - Y line)
-  var hasUniqueCLine = true; // TODO: Add hasUniqueCLine logic (whether the file contains a unique C line)
+
+  var hasOneAndOnlyOneCLine =
+    parsedData.filter((line, index) => {
+      return line[0] === "C";
+    }).length === 1;
+
+  var noOutOfBounds = () => {
+    if (hasOneAndOnlyOneCLine) {
+      var cLine = parsedData.filter((line, index) => {
+        return line[0] === "C";
+      });
+      return (
+        parsedData.filter((line, index) => {
+          if (["C", "T", "M"].includes(line[0])) {
+            return (
+              line[1] < 0 &&
+              line[1] > cLine[1] &&
+              line[2] < 0 &&
+              line[2] > cLine[2]
+            );
+          } else if (line[0] === "A") {
+            return (
+              line[2] < 0 &&
+              line[2] > cLine[1] &&
+              line[3] < 0 &&
+              line[3] > cLine[2]
+            );
+          }
+          return false;
+        }).length === 0
+      );
+    }
+    return false;
+  };
+
   return (
-    respectedRules && noOverlap && noOutOfBounds && hasCLine && hasUniqueCLine
+    respectedRules && noOverlap && noOutOfBounds() && hasOneAndOnlyOneCLine
   );
 };
 
-Transformer.prototype.createMap = function (validData) {
-  var C = validData.filter(function (line) {
+Transformer.prototype.initMap = function (parsedData) {
+  var cLine = parsedData.filter(function (line) {
     return line[0] === "C";
   })[0];
-  var height = Number(C[1]);
-  var width = Number(C[2]);
+  var height = Number(cLine[1]);
+  var width = Number(cLine[2]);
   var matrix = Array(height)
     .fill(null)
     .map(function (a, i) {
@@ -79,7 +118,24 @@ Transformer.prototype.createMap = function (validData) {
           return { value: 1, type: "Grass", x: i + 1, y: j + 1 };
         });
     });
-  return { matrix: matrix, height: height, width: width };
+  return { matrix, height, width };
+};
+
+Transformer.prototype.populateMap = function (map, parsedData) {
+  parsedData.forEach((line) => {
+    if (line[0] === "T") {
+      map.matrix[line[1]][line[2]].type = "Treasure";
+      map.matrix[line[1]][line[2]].value = line[3];
+    }
+    if (line[0] === "M") map.matrix[line[1]][line[2]].type = "Mountain";
+    if (line[0] === "A") {
+      map.matrix[line[2]][line[3]].type = "Player";
+      map.matrix[line[2]][line[3]].name = line[1];
+      map.matrix[line[2]][line[3]].orientation = line[4];
+      map.matrix[line[2]][line[3]].sequence = line[5];
+    }
+  });
+  return map;
 };
 
 module.exports = Transformer;

@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
       file.mv("./uploads/last-file.txt");
       fs.readFile("./uploads/last-file.txt", "utf8", function (err, data) {
         var result = transformer.transformData(data);
-        console.log("newData", result.transformedData);
+        console.log('result.transformedData', JSON.stringify(result.transformedData));
 
         fs.writeFile(
           "./public/new-file.txt",
@@ -36,6 +36,8 @@ router.post("/", async (req, res) => {
           message: result.valid ? "File is uploaded" : "Incorrect file format",
           newFileUrl: result.valid ? "./new-file.txt" : "",
           map: result.transformedData,
+          parsedData: result.parsedData,
+          test: JSON.stringify(result.test),
           newMap: {},
         });
       });
