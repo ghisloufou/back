@@ -20,13 +20,9 @@ router.post("/", async (req, res) => {
       fs.readFile("./uploads/last-file.txt", "utf8", function (err, data) {
         var result = transformer.transformData(data);
 
-        fs.writeFile(
-          "./public/new-file.txt",
-          "result.transformedData",
-          function (err) {
-            if (err) return console.log(err);
-          }
-        );
+        fs.writeFile("./public/new-file.txt", result.newData, function (err) {
+          if (err) return console.log(err);
+        });
 
         // Send response
         res.send({

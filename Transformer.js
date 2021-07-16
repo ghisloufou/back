@@ -38,14 +38,15 @@ Transformer.prototype.transformData = function (data) {
   if (validData) {
     var map = this.initMap(parsedData);
     var populatedMap = this.populateMap(map, parsedData);
-    var result = this.movePlayers(map, parsedData);
-    // TODO: Generate new file with newMap
+    const result = this.movePlayers(map, parsedData);
+    const newData = this.generateNeWFile(result.transformedMap);
 
     validData = !result.movementError;
     return {
       valid: validData,
       map: populatedMap,
       transformedMap: result.transformedMap,
+      newData,
     };
   }
   return { valid: validData, map: null, transformedMap: null };
@@ -58,14 +59,65 @@ Transformer.prototype.transformData = function (data) {
  */
 Transformer.prototype.parseData = function (data) {
   var lines = data.split("\n");
-  return lines.map(function (line) {
-    var args = line.replace(/\s/g, "").split("-");
-    return args.map((arg) => {
-      // Check wheter the arg is a digit
-      if (/^[0-9]*$/.test(arg)) arg = Number(arg);
-      return arg;
+  return lines
+    .map((line) => {
+      var args = line.replace(/\s/g, "").split("-");
+      return args.map((arg) => {
+        // Check whether the arg is a digit to assign the proper type
+        if (/^[0-9]*$/.test(arg)) arg = Number(arg);
+        return arg;
+      });
+    }) // Ignore comment lines starting by #
+    .filter((line) => line[0][0] !== "#");
+};
+
+/**
+ * Generate new file from transformed map
+ * @param {"TreasureMap"} map Input file content
+ * @returns {string} String to put in new file
+ */
+Transformer.prototype.generateNeWFile = function (map) {
+  let result = "";
+  result += `C - ${map.width} - ${map.height}\r\n`;
+  map.matrix.forEach((row) => {
+    row.forEach((cell) => {
+      switch (cell.type) {
+        case "Player":
+          result += `# {A comme Aventurier} - {Nom de l’aventurier} - {Axe horizontal} - {Axe vertical} - {Orientation} - {Nb. trésors ramassés} - {Etape de l'aventurier}\r\n`;
+          result += `A - ${cell.name} - ${cell.x - 1} - ${cell.y - 1} - ${
+            cell.orientation
+          } - ${cell.playerValue} - ${cell.stepCount}\r\n`;
+          break;
+        case "WasPlayer":
+          result += `# {P comme Passage d'un Aventurier} - {Nom de l’aventurier passé} - {Axe horizontal} - {Axe vertical} - {Etape à laquelle il est passé}\r\n`;
+          result += `P - ${cell.lastPlayerName} - ${cell.x - 1} - ${
+            cell.y - 1
+          } - ${cell.stepCount}\r\n`;
+          break;
+        case "Treasure&Player":
+          result += `# {TA comme Trésor et Aventurier} - {Nom de l'aventurier} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors restants} - {Orientation} - {Nb. trésors ramassés} - {Etape de l'aventurier}\r\n`;
+          result += `TA - ${cell.name} - ${cell.x - 1} - ${cell.y - 1} - ${
+            cell.treasureCount
+          } - ${cell.orientation} - ${cell.playerValue} - ${
+            cell.stepCount
+          }\r\n`;
+          break;
+        case "Treasure":
+          result += `# {T comme Trésor} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors restants} - {Etape à laquelle il a été ramassé dernièrement}\r\n`;
+          result += `T - ${cell.x - 1} - ${cell.y - 1} - ${
+            cell.treasureCount
+          } - ${cell.stepCount}\r\n`;
+          break;
+        case "Mountain":
+          result += `# {M comme Trésor} - {Axe horizontal} - {Axe vertical}\r\n`;
+          result += `M - ${cell.x - 1} - ${cell.y - 1}\r\n`;
+          break;
+        default:
+          break;
+      }
     });
   });
+  return result;
 };
 
 /**
@@ -213,14 +265,11 @@ Transformer.prototype.movePlayers = function (map, parsedData) {
   var players = newParsedData.filter((line) => line[0] === "A");
   var newMap = cloneDeep(map);
   var movementError = false; // Check wheter the player sequence is feasible
-  console.log("players", players);
-  console.log("parsedData", parsedData);
 
   const updateMap = function (player, nextMovement, index) {
     const nextCell =
       newMap.matrix[nextMovement.player[3]][nextMovement.player[2]];
     const lastCell = newMap.matrix[player[3]][player[2]];
-    console.log('nextMovement.didMove', nextMovement.didMove);
     if (nextMovement.didMove) {
       // Edit new cell
       if (nextCell.type === "Treasure") {
@@ -273,7 +322,6 @@ Transformer.prototype.movePlayers = function (map, parsedData) {
     for (let player of players) {
       if (player[5].length > i) {
         const nextMove = player[5][i];
-        console.log("nextMove", nextMove);
         if (["A", "G", "D"].includes(nextMove)) {
           const movement = this.move(player, nextMove, cLine, newMap);
           updateMap(player, movement, i);
@@ -312,9 +360,7 @@ Transformer.prototype.move = function (playerArg, nextMove, cLine, newMap) {
       y + moveY < cLine[2] &&
       y + moveY >= 0;
     if (isNotOutOfBound) {
-      console.log('x + moveX, y + moveY', x + moveX, y + moveY);
       const nextCell = newMap.matrix[y + moveY][x + moveX];
-      console.log("nextCell", nextCell);
       var isMountain = nextCell.type === "Mountain";
       var isPlayer =
         nextCell.type === "Player" || nextCell.type === "Treasure&Player";
@@ -329,14 +375,12 @@ Transformer.prototype.move = function (playerArg, nextMove, cLine, newMap) {
 
   const movePlayer = function (player, moveX, moveY) {
     let didMove = false;
-    console.log('player1', player);
     const isTreasure = nextMoveTreasure(player[2], player[3], moveX, moveY);
     if (isNextMoveValid(player[2], player[3], moveX, moveY)) {
       player[2] += moveX;
       player[3] += moveY;
       didMove = true;
     }
-    console.log('player2', player);
     return {
       player,
       isTreasure,
@@ -346,8 +390,6 @@ Transformer.prototype.move = function (playerArg, nextMove, cLine, newMap) {
 
   let movement = { player: movedPlayer, isTreasure: false, didMove: false };
 
-  console.log("(nextMove, movedPlayer[4]):", nextMove, movedPlayer[4]);
-  console.log('before movement', movement);
   switch (nextMove) {
     case "A":
       // Check whether the next case is not out of bounds, nor a mountain, nor a player then IGNORE THESE MOVES
@@ -365,7 +407,6 @@ Transformer.prototype.move = function (playerArg, nextMove, cLine, newMap) {
           movement = movePlayer(movedPlayer, 1, 0);
           break;
       }
-      console.log('after movement', movement);
       break;
     case "G":
       // Change orientation to the left
@@ -403,7 +444,6 @@ Transformer.prototype.move = function (playerArg, nextMove, cLine, newMap) {
       break;
   }
 
-  console.log("(nextMove222, movedPlayer[4]):", nextMove, movedPlayer[4]);
   return movement;
 };
 

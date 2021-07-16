@@ -8,6 +8,7 @@ describe("Transformer", function () {
     transformer = new Transformer();
   });
 
+    // TODO: Add tests
   //   it("should transform data according to the exercise rules", function () {
   //     fs.readFile("test.txt", "utf8", function (err, data) {
   //       var newData = transformer.transformData(data);
