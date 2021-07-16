@@ -13,10 +13,9 @@ router.post("/", async (req, res) => {
         message: "No file uploaded",
       });
     } else {
-      //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
       let file = req.files.file;
 
-      //Use the mv() method moves the file in the given path
+      // The mv() method moves the file in the given path
       file.mv("./uploads/last-file.txt");
       fs.readFile("./uploads/last-file.txt", "utf8", function (err, data) {
         var result = transformer.transformData(data);
@@ -29,13 +28,13 @@ router.post("/", async (req, res) => {
           }
         );
 
-        //send response
+        // Send response
         res.send({
           status: result.valid,
           message: result.valid ? "File is uploaded" : "Incorrect file format",
           newFileUrl: result.valid ? "./new-file.txt" : "",
-          map: result.transformedData,
-          newMap: {},
+          map: result.map,
+          newMap: result.transformedMap,
         });
       });
     }
