@@ -8,18 +8,9 @@ describe("Transformer", function () {
     transformer = new Transformer();
   });
 
-    // TODO: Add tests
-  //   it("should transform data according to the exercise rules", function () {
-  //     fs.readFile("test.txt", "utf8", function (err, data) {
-  //       var newData = transformer.transformData(data);
-  //     expect(newData).toEqual({ valid: true, transformedData: parsedData });
-  //     });
-  //   });
-
   // Can't manage to make this test work due to line breaks
 //   it("should read file data", function () {
 //     fs.readFile("spec/test.txt", "utf8", function (err, data) {
-//       console.log("data", data);
 //       expect(data).toEqual(
 //         `C - 3 - 4
 //      M - 1 - 0

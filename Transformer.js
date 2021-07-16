@@ -272,12 +272,17 @@ Transformer.prototype.movePlayers = function (map, parsedData) {
     const lastCell = newMap.matrix[player[3]][player[2]];
     if (nextMovement.didMove) {
       // Edit new cell
-      if (nextCell.type === "Treasure") {
+      if (nextCell.type === "Treasure" && nextCell.treasureCount > 1) {
         nextCell.type = "Treasure&Player";
         nextCell.playerValue = lastCell.playerValue + 1;
+        nextCell.treasureCount -= 1;
       } else {
-        nextCell.type = "Player";
         nextCell.playerValue = lastCell.playerValue;
+        if (nextCell.type === "Treasure" && nextCell.treasureCount === 1) {
+          delete nextCell.treasureCount;
+          nextCell.playerValue += + 1;
+        }
+        nextCell.type = "Player";
       }
       nextCell.name = lastCell.name;
       nextCell.sequence = lastCell.sequence;
@@ -300,7 +305,6 @@ Transformer.prototype.movePlayers = function (map, parsedData) {
       // Edit last cell
       if (lastCell.type === "Treasure&Player" && lastCell.treasureCount > 0) {
         lastCell.type = "Treasure";
-        lastCell.treasureCount -= 1;
       } else {
         lastCell.type = "WasPlayer";
         lastCell.lastPlayerName = nextCell.name;
