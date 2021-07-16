@@ -14,6 +14,8 @@ Run `npm start` to build the project into the backend public folder.
 
 Run `npm test`
 
-## Room for improvements:
+### Input example
+An example file that can be used as input can be found in "spec\test.txt"
+## Room for improvements
 
 Add more unit tests
